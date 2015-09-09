@@ -10,6 +10,7 @@
 #define TIME_START  0.0
 #define TIME_MAX    200.0
 #define TIME_D      0.01
+#define REPORT_INTERVAL 10.0
 
 #define IMMUNITY_RATE 0.01
 #define RECOVERY_RATE 0.3

@@ -24,6 +24,7 @@ void timestep(double td)
 int main( void )
 {
   double t;
+  double report_interval = REPORT_INTERVAL;
  
   h_pop = malloc(sizeof(struct human_population));
   m_pop = malloc(sizeof(struct mosquito_population));
@@ -42,19 +43,35 @@ int main( void )
   m_pop->uninfected = MOSQUITO_UNINFECTED_0;
   m_pop->vectors = MOSQUITO_VECTORS_0;
 
+  /* Print CSV header */
+  printf("time,human_uninfected,human_hosts,human_immune,"
+          "mosquito_uninfected,mosquito_vectors\n");
+
+  /* Main simulation loop */
   for (t = TIME_START; t < TIME_MAX; t += TIME_D)
   {
     timestep(TIME_D);
+
+    /* Every REPORT_INTERVAL timesteps, print simulation progression */
+    if (t > report_interval - (TIME_D / 10.0)
+        && t < report_interval + (TIME_D / 10.0))
+    {
+      printf("%f,%f,%f,%f,%f,%f\n",t,h_pop->uninfected,h_pop->hosts,
+              h_pop->immune,m_pop->uninfected,m_pop->vectors);
+      report_interval += REPORT_INTERVAL;
+    }
   }
 
-  printf("Human population\n");
-  printf(" - Uninfected: %f\n", h_pop->uninfected);
-  printf(" - Hosts:      %f\n", h_pop->hosts);
-  printf(" - Immune:     %f\n", h_pop->immune);
+  /* Final reporting */
+  fprintf(stderr, "Time:          %f\n", t - TIME_D);
+  fprintf(stderr, "Human population\n");
+  fprintf(stderr, " - Uninfected: %f\n", h_pop->uninfected);
+  fprintf(stderr, " - Hosts:      %f\n", h_pop->hosts);
+  fprintf(stderr, " - Immune:     %f\n", h_pop->immune);
 
-  printf("\nMosquito population\n");
-  printf(" - Uninfected: %f\n", m_pop->uninfected);
-  printf(" - Vectors:    %f\n", m_pop->vectors);
+  fprintf(stderr, "\nMosquito population\n");
+  fprintf(stderr, " - Uninfected: %f\n", m_pop->uninfected);
+  fprintf(stderr, " - Vectors:    %f\n", m_pop->vectors);
 
   return 0;
 }
