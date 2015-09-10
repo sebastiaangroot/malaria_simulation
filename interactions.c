@@ -3,17 +3,26 @@
 extern struct human_population *h_pop;
 extern struct mosquito_population *m_pop;
 
+/* Probability of a mosquito being a vector */
 static double p_vector( void )
 {
   return m_pop->vectors /
           (m_pop->uninfected + m_pop->vectors);
 }
 
+/* Probability of a human being a host */
 static double p_host( void )
 {
   return h_pop->hosts /
           (h_pop->uninfected + h_pop->hosts + h_pop->immune);
 }
+
+/*
+ * Population-change functions.
+ * Each function calculates the population of a certain
+ * group given the previous population state h_pop and
+ * m_pop and time increment td.
+ */
 
 double human_uninfected( double td )
 {

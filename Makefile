@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra
+CFLAGS=-Wall -Wextra -O3
 SRC=main.c interactions.c
 BIN=malaria
 
