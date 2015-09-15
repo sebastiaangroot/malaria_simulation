@@ -16,6 +16,7 @@ void timestep(double td)
 
   m_new.uninfected = mosquito_uninfected( td );
   m_new.vectors = mosquito_vectors( td );
+  m_new.incubated = mosquito_incubated( td );
 
   *h_pop = h_new;
   *m_pop = m_new;
@@ -41,11 +42,12 @@ int main( void )
   h_pop->immune = HUMAN_IMMUNE_0;
 
   m_pop->uninfected = MOSQUITO_UNINFECTED_0;
+  m_pop->incubated = MOSQUITO_INCUBATED_0;
   m_pop->vectors = MOSQUITO_VECTORS_0;
 
   /* Print CSV header */
   printf("time,human_uninfected,human_hosts,human_immune,"
-          "mosquito_uninfected,mosquito_vectors\n");
+          "mosquito_uninfected,mosquito_incubated,mosquito_vectors\n");
 
   /* Main simulation loop */
   for (t = TIME_START; t < TIME_MAX; t += TIME_D)
@@ -56,8 +58,8 @@ int main( void )
     if (t > report_interval - (TIME_D / 10.0)
         && t < report_interval + (TIME_D / 10.0))
     {
-      printf("%f,%f,%f,%f,%f,%f\n",t,h_pop->uninfected,h_pop->hosts,
-              h_pop->immune,m_pop->uninfected,m_pop->vectors);
+      printf("%f,%f,%f,%f,%f,%f,%f\n",t,h_pop->uninfected,h_pop->hosts,
+              h_pop->immune,m_pop->uninfected,m_pop->incubated,m_pop->vectors);
       report_interval += REPORT_INTERVAL;
     }
   }
@@ -71,6 +73,7 @@ int main( void )
 
   fprintf(stderr, "\nMosquito population\n");
   fprintf(stderr, " - Uninfected: %f\n", m_pop->uninfected);
+  fprintf(stderr, " - Incubated:  %f\n", m_pop->incubated);
   fprintf(stderr, " - Vectors:    %f\n", m_pop->vectors);
 
   return 0;
