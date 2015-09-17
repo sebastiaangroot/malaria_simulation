@@ -1,6 +1,8 @@
 #ifndef INTERACTIONS_H
 #define INTERACTIONS_H
 
+#include "conveyor.h"
+
 #define HUMAN_UNINFECTED_0  300.0
 #define HUMAN_HOSTS_0       1.0
 #define HUMAN_IMMUNE_0      0.0
@@ -22,6 +24,7 @@
 #define MOSQUITO_BIRTH_RATE 0.01
 #define MOSQUITO_DEATH_RATE 0.01
 #define MOSQUITO_INFECTION_RATE 0.1
+#define MOSQUITO_INCUBATION_TIME 10
 #define PROB_BITE_HUMAN 0.3
 
 struct human_population {
@@ -32,6 +35,7 @@ struct human_population {
 
 struct mosquito_population {
   double uninfected;
+  struct conveyor *tainted_conv;
   double tainted;
   double vectors;
 };
@@ -44,7 +48,7 @@ double human_hosts( double td );
 double human_immune( double td );
 
 double mosquito_uninfected( double td );
-double mosquito_tainted( double td );
+void mosquito_tainted( double td );
 double mosquito_vectors( double td );
 
 #endif

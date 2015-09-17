@@ -1,4 +1,5 @@
 #include "interactions.h"
+#include "conveyor.h"
 
 extern struct human_population *h_pop;
 extern struct mosquito_population *m_pop;
@@ -65,18 +66,15 @@ double mosquito_uninfected( double td )
                 * ((MOSQUITO_DEATH_RATE * td) + ( (PROB_BITE_HUMAN * td) * p_host())) );
 }
 
-double mosquito_tainted( double td )
+void mosquito_tainted( double td )
 {
-  return m_pop->tainted
-          + ( m_pop->uninfected * (PROB_BITE_HUMAN * td) * p_host())
-          - ( m_pop->tainted 
-                * ((MOSQUITO_DEATH_RATE * td) + (MOSQUITO_INFECTION_RATE * td)) );
+  conveyor_add_influx( m_pop->uninfected * (PROB_BITE_HUMAN * td) * p_host() , m_pop->tainted_conv );
 }
 
 double mosquito_vectors( double td )
 {
   return m_pop->vectors
-          + (m_pop->tainted * (MOSQUITO_INFECTION_RATE * td))
+          + conveyor_get_outflux( m_pop->tainted_conv )
           - (m_pop->vectors * (MOSQUITO_DEATH_RATE * td));
 }
 
