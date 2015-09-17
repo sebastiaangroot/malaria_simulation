@@ -73,6 +73,7 @@ void update_conveyor( struct conveyor *conv, double td )
 {
   int i;
   struct conveyor_queue *q;
+  double change;
 
   /* Update conveyor clock */
   conv->time += td;
@@ -85,7 +86,9 @@ void update_conveyor( struct conveyor *conv, double td )
   i = q->tail;
   while (i != q->head)
   {
-    q->queue[i].value -= q->queue[i].value * (conv->outflux_rate * td);
+    change = q->queue[i].value * (conv->outflux_rate * td);
+    q->total_value -= change;
+    q->queue[i].value -= change;
     if (i == q->max-1)
       i = 0;
     else
