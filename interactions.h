@@ -13,9 +13,12 @@
 #define MOSQUITO_TAINTED_0  0.0
 
 #define TIME_START  0.0
-#define TIME_MAX    365.0
+//#define TIME_MAX    365.0
+#define TIME_MAX  1000000.0
 #define TIME_D      0.01
-#define REPORT_INTERVAL 1.0
+//#define REPORT_INTERVAL 1.0
+#define REPORT_INTERVAL 2000000.0
+
 
 #define PIMMUNITY_RATE 0.01 // Rate of hosts becoming partially immune
 #define PIMMUNE_HOST  0.99 // Chance that partially immune becomes symptomless carrier of the disease, vs losing immunity and becoming infected
@@ -49,6 +52,8 @@ struct mosquito_population {
 
 extern struct human_population *h_pop;
 extern struct mosquito_population *m_pop;
+
+void prepare_round( double td );
 
 double human_uninfected( double td );
 double human_hosts( double td );

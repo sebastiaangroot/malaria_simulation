@@ -11,13 +11,10 @@ void timestep(double td)
   struct human_population h_new;
   struct mosquito_population m_new;
 
-  /* Step 1: Get current population in conveyors */
-  m_pop->tainted = conveyor_get_population( m_pop->tainted_conv );
+  /* Step 1: Round update pre-work */
+  prepare_round( td );
 
-  /* Step 2: Update conveyor timers and outflux */
-  update_conveyor( m_pop->tainted_conv, td );
-
-  /* Step 3: Calculate new population */
+  /* Step 2: Calculate new population */
   h_new.uninfected = human_uninfected( td );
   h_new.hosts = human_hosts( td );
   h_new.pimmune = human_pimmune( td );
@@ -28,8 +25,7 @@ void timestep(double td)
   mosquito_tainted( td );
   m_new.vectors = mosquito_vectors( td );
 
-
-  /* Step 4: Update h_pop and m_pop */
+  /* Step 3: Update h_pop and m_pop */
   *h_pop = h_new;
   m_pop->uninfected = m_new.uninfected;
   m_pop->vectors = m_new.vectors;
