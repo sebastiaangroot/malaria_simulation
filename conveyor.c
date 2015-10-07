@@ -76,17 +76,18 @@ void update_conveyor( struct conveyor *conv, double td )
   struct conveyor_queue *q;
 
   /* Update conveyor clock */
-  conv->time += td;
   q = conv->queue;
   i = q->tail;
   n = q->n;
   while (n)
   {
     obj = &q->queue[i];
-    obj->value -= obj->value * conv->outflux_rate * td;
+    obj->value = obj->value - (obj->value * conv->outflux_rate * td);
     n--;
     i = (i + 1) % q->max;
   }
+
+  conv->time += td;
 }
 
 double conveyor_get_outflux( struct conveyor *conv )
