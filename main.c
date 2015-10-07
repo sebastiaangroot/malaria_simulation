@@ -16,9 +16,9 @@ void timestep(double td)
 
   /* Step 2: Calculate new population */
   h_new.uninfected = human_uninfected( td );
+  human_tainted( td );
   h_new.hosts = human_hosts( td );
   h_new.pimmune = human_pimmune( td );
-  h_new.pimmune_hosts = human_pimmune_hosts( td );
   h_new.remission = human_remission( td );
 
   m_new.uninfected = mosquito_uninfected( td );
@@ -26,7 +26,10 @@ void timestep(double td)
   m_new.vectors = mosquito_vectors( td );
 
   /* Step 3: Update h_pop and m_pop */
-  *h_pop = h_new;
+  h_pop->uninfected = h_new.uninfected;
+  h_pop->hosts = h_new.hosts;
+  h_pop->pimmune = h_new.pimmune;
+  h_pop->remission = h_new.remission;
   m_pop->uninfected = m_new.uninfected;
   m_pop->vectors = m_new.vectors;
 }
@@ -46,8 +49,9 @@ int main( void )
   }
 
   m_pop->tainted_conv = malloc(sizeof(struct conveyor));
+  h_pop->tainted_conv = malloc(sizeof(struct conveyor));
 
-  if (!m_pop->tainted_conv)
+  if (!m_pop->tainted_conv || !h_pop->tainted_conv)
   {
     fprintf(stderr, "failed to allocate memory during init\n");
     exit(1);
@@ -55,14 +59,21 @@ int main( void )
 
   /* Initial population */
   h_pop->uninfected = HUMAN_UNINFECTED_0;
+  h_pop->tainted = HUMAN_TAINTED_0;
   h_pop->hosts = HUMAN_HOSTS_0;
   h_pop->pimmune = HUMAN_PIMMUNE_0;
-  h_pop->pimmune_hosts = HUMAN_PIMMUNE_HOSTS_0;
   h_pop->remission = HUMAN_REMISSION_0;
 
   m_pop->uninfected = MOSQUITO_UNINFECTED_0;
   m_pop->tainted = MOSQUITO_TAINTED_0;
   m_pop->vectors = MOSQUITO_VECTORS_0;
+
+  initialize_conveyor(
+    h_pop->tainted_conv,
+    HUMAN_INCUBATION_TIME,
+    HUMAN_DEATH_RATE,
+    (int)(((1.0 / TIME_D) * HUMAN_INCUBATION_TIME) + 2.0)
+  );
 
   initialize_conveyor( 
     m_pop->tainted_conv,      /* struct conveyor * */
@@ -72,7 +83,7 @@ int main( void )
   );
 
   /* Print CSV header */
-  printf("time,human_uninfected,human_hosts,human_pimmune,human_pimmune_hosts,human_remission,"
+  printf("time,human_uninfected,human_tainted,human_hosts,human_pimmune,human_remission,"
           "mosquito_uninfected,mosquito_tainted,mosquito_vectors\n");
 
   /* Main simulation loop */
@@ -84,8 +95,8 @@ int main( void )
     if (t > report_interval - (TIME_D / 10.0)
         && t < report_interval + (TIME_D / 10.0))
     {
-      printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t,h_pop->uninfected,h_pop->hosts,
-              h_pop->pimmune,h_pop->pimmune_hosts,h_pop->remission,m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);
+      printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t,h_pop->uninfected,conveyor_get_population(h_pop->tainted_conv),h_pop->hosts,
+              h_pop->pimmune,h_pop->remission,m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);
       report_interval += REPORT_INTERVAL;
     }
   }
@@ -94,14 +105,14 @@ int main( void )
   fprintf(stderr, "Time:                      %f\n", t - TIME_D);
   fprintf(stderr, "Human population\n");
   fprintf(stderr, " - Uninfected:             %f\n", h_pop->uninfected);
+  fprintf(stderr, " - Tainted:                %f\n", conveyor_get_population(h_pop->tainted_conv));
   fprintf(stderr, " - Hosts:                  %f\n", h_pop->hosts);
   fprintf(stderr, " - Partially immune:       %f\n", h_pop->pimmune);
-  fprintf(stderr, " - Partially immune hosts: %f\n", h_pop->pimmune_hosts);
   fprintf(stderr, " - Remission:              %f\n", h_pop->remission);
 
   fprintf(stderr, "\nMosquito population\n");
   fprintf(stderr, " - Uninfected:             %f\n", m_pop->uninfected);
-  fprintf(stderr, " - Tainted  :              %f\n", conveyor_get_population(m_pop->tainted_conv));
+  fprintf(stderr, " - Tainted:                %f\n", conveyor_get_population(m_pop->tainted_conv));
   fprintf(stderr, " - Vectors:                %f\n", m_pop->vectors);
 
   return 0;

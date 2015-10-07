@@ -14,9 +14,8 @@ double p_host_c;
 
 static double human_population( void )
 {
-  return h_pop->uninfected + h_pop->hosts + h_pop->pimmune + h_pop->pimmune_hosts + h_pop->remission;
+  return h_pop->uninfected + h_pop->tainted + h_pop->hosts + h_pop->pimmune + h_pop->remission;
 }
-
 
 static double mosquito_population( void )
 {
@@ -49,15 +48,17 @@ static double p_vector( void )
 /* Probability of a human being a host */
 static double p_host( void )
 {
-  return (h_pop->hosts + h_pop->pimmune_hosts) / human_population();
+  return (h_pop->hosts + h_pop->pimmune) / human_population();
 }
 
 void prepare_round( double td )
 {
   /* Update conveyor timers */
+  update_conveyor( h_pop->tainted_conv, td );
   update_conveyor( m_pop->tainted_conv, td );
 
   /* Pre-compute population of conveyors */
+  h_pop->tainted = conveyor_get_population( h_pop->tainted_conv );
   m_pop->tainted = conveyor_get_population( m_pop->tainted_conv );
 
   /* Pre-compute round constants */
@@ -85,12 +86,16 @@ double human_uninfected( double td )
           - (h_pop->uninfected * (HUMAN_DEATH_RATE * td));
 }
 
+void human_tainted( double td )
+{
+  conveyor_add_influx( (h_pop->uninfected + h_pop->remission) * (get_prob_bit_c * td) * p_vector_c, h_pop->tainted_conv );
+}
+
 double human_hosts( double td )
 {
   return h_pop->hosts
-          + ((h_pop->uninfected + h_pop->remission) * (get_prob_bit_c * td) * p_vector_c)
+          + conveyor_get_outflux( h_pop->tainted_conv )
           + (h_pop->remission * (RELAPSE_RATE * td))
-          + (h_pop->pimmune * ((get_prob_bit_c * td) * p_vector_c * (1.0 - PIMMUNE_HOST)))
           - (h_pop->hosts
             * (( PIMMUNITY_RATE + MALARIA_INDUCED_DEATH_RATE + RECOVERY_RATE + HUMAN_DEATH_RATE + REMISSION_RATE) * td));
 }
@@ -99,16 +104,7 @@ double human_pimmune( double td )
 {
   return h_pop->pimmune
           + (h_pop->hosts * (PIMMUNITY_RATE * td))
-          - (h_pop->pimmune * (get_prob_bit_c * td) * p_vector_c)
           - (h_pop->pimmune * (HUMAN_DEATH_RATE * td));
-}
-
-double human_pimmune_hosts( double td )
-{
-  return h_pop->pimmune_hosts
-          + (h_pop->pimmune * ((get_prob_bit_c * td) * p_vector_c * PIMMUNE_HOST))
-          - (h_pop->pimmune_hosts * (RECOVERY_RATE * td))
-          - (h_pop->pimmune_hosts * (HUMAN_DEATH_RATE * td));
 }
 
 double human_remission( double td )
