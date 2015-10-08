@@ -6,7 +6,7 @@
 static struct conveyor_object *dequeue( struct conveyor_queue *q )
 {
   struct conveyor_object *obj;
-
+  
   if (q->n == 0)
     return NULL;
 
@@ -18,14 +18,14 @@ static struct conveyor_object *dequeue( struct conveyor_queue *q )
   return obj;
 }
 
-static void enqueue( struct conveyor_queue *q, double value, double limit)
+static void enqueue( struct conveyor_queue *q, double value, double limit )
 {
   if (q->n == q->max)
   {
     fprintf(stderr, "conveyor enqueue: attempting to enqueue (max %d) on a full queue!\n", q->max);
     exit(1);
   }
-
+  
   q->total_value += value;
   q->queue[q->head].value = value;
   q->queue[q->head].limit = limit;
@@ -83,7 +83,7 @@ void update_conveyor( struct conveyor *conv, double td )
   while (n)
   {
     obj = &q->queue[i];
-    outflux = obj->value * (conv->outflux_rate * td);
+    outflux = obj->value * ((conv->outflux_rate * OUTFLUX_CORRECTION_FACTOR) * td);
     obj->value = obj->value - outflux;
     q->total_value -= outflux;
     n--;
@@ -119,8 +119,34 @@ void conveyor_add_influx( double value, struct conveyor *conv )
   enqueue(conv->queue, value, conv->time + conv->conv_time);
 }
 
+
 double conveyor_get_population( struct conveyor *conv )
 {
   return conv->queue->total_value;
 }
+
+/*
+double conveyor_get_population_analytic( struct conveyor *conv )
+{
+  int i, n;
+  struct conveyor_object *obj;
+  struct conveyor_queue *q;
+  double total = 0.0, t;
+
+  q = conv->queue;
+  i = q->tail;
+  n = q->n;
+  while (n)
+  {
+    obj = &q->queue[i];
+    t = conv->time - obj->time_start;
+    total += obj->value * pow(M_E, (conv->outflux_rate * t));
+
+    n--;
+    i = (i + 1) % q->max;
+  }
+
+  return total;
+}
+*/
 

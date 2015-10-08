@@ -1,6 +1,8 @@
 #ifndef CONVEYOR_H
 #define CONVEYOR_H
 
+#define OUTFLUX_CORRECTION_FACTOR  0.9925
+
 struct conveyor_object {
   double value;
   double limit;
