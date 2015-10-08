@@ -76,7 +76,7 @@ void update_conveyor( struct conveyor *conv, double td )
   struct conveyor_queue *q;
   double outflux;
 
-  /* Update conveyor clock */
+  /* Update outflux for each item */
   q = conv->queue;
   i = q->tail;
   n = q->n;
@@ -90,6 +90,7 @@ void update_conveyor( struct conveyor *conv, double td )
     i = (i + 1) % q->max;
   }
 
+  /* Update conveyor time */
   conv->time += td;
 }
 
