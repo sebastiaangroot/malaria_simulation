@@ -74,6 +74,7 @@ void update_conveyor( struct conveyor *conv, double td )
   int i, n;
   struct conveyor_object *obj;
   struct conveyor_queue *q;
+  double outflux;
 
   /* Update conveyor clock */
   q = conv->queue;
@@ -82,7 +83,9 @@ void update_conveyor( struct conveyor *conv, double td )
   while (n)
   {
     obj = &q->queue[i];
-    obj->value = obj->value - (obj->value * conv->outflux_rate * td);
+    outflux = obj->value * (conv->outflux_rate * td);
+    obj->value = obj->value - outflux;
+    q->total_value -= outflux;
     n--;
     i = (i + 1) % q->max;
   }
@@ -94,7 +97,6 @@ double conveyor_get_outflux( struct conveyor *conv )
 {
   struct conveyor_object *obj;
   double ret = 0.0;
-//  double i;
   
   while ((obj = queue_peek(conv->queue)) != NULL)
   {
@@ -104,10 +106,6 @@ double conveyor_get_outflux( struct conveyor *conv )
 
     /* Dequeue and add the value to the return value */
     obj = dequeue(conv->queue);
-/*    for (i = 0.0; i < conv->conv_time; i += 0.1)
-    {
-      obj->value -= obj->value * conv->outflux_rate * 0.1;
-    }*/
     ret += obj->value;
   }
 
