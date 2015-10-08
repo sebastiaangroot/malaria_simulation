@@ -87,15 +87,17 @@ void prepare_round( double td )
 /* Newborn */
 double human_newborn_uninfected( double td )
 {
+  //printf("newb(%f) -> %f | ", h_pop_newb->uninfected, h_pop_newb->uninfected * (FROM_NEWBORN_TO_TODDLER));
   return h_pop_newb->uninfected
           + (human_population_c * (HUMAN_BIRTH_RATE * td))
           - (h_pop_newb->uninfected * (HUMAN_DEATH_RATE * td))
-          - (h_pop_newb->uninfected * (FROM_NEWBORN_TO_TODDLER));
+          - (h_pop_newb->uninfected * (FROM_NEWBORN_TO_TODDLER * td));
 }
 
 /* Normal toddler */
 double human_toddler_n_uninfected( double td )
 {
+  //printf("todn(%f) -> %f | ", h_pop_tod_n->uninfected, h_pop_tod_n->uninfected * (FROM_TODDLER_TO_ADULT * td));
   return h_pop_tod_n->uninfected
     + (h_pop_newb->uninfected * (FROM_NEWBORN_TO_TODDLER * td) * (1 - SICKLE_CELL_RATE))
     + (h_pop_tod_n->hosts * (RECOVERY_RATE * td))
@@ -136,6 +138,7 @@ double human_toddler_n_remission( double td)
 /* Toddler with sickle cell anemia*/
 double human_toddler_s_uninfected( double td )
 {
+  //printf("tods(%f) -> %f\n", h_pop_tod_s->uninfected, h_pop_tod_s->uninfected * (FROM_TODDLER_TO_ADULT * td));
   return h_pop_tod_s->uninfected
     + (h_pop_newb->uninfected * (FROM_NEWBORN_TO_TODDLER * td) * (SICKLE_CELL_RATE))
     + (h_pop_tod_s->hosts * (RECOVERY_RATE * td))
@@ -219,8 +222,6 @@ double human_adult_remission( double td )
 
 double mosquito_uninfected( double td )
 {
-  printf("mp:%f - ", mosquito_population_c);
-  printf("mu:+b:%f, -d:%f, -i:%f - ", ( mosquito_population_c * (MOSQUITO_BIRTH_RATE * td) ), ( m_pop->uninfected * (MOSQUITO_DEATH_RATE * td)), ( m_pop->uninfected * ((get_prob_bite_human_c * td) * p_host_c)));
   return m_pop->uninfected
           + ( mosquito_population_c * (MOSQUITO_BIRTH_RATE * td) )
           - ( m_pop->uninfected * (MOSQUITO_DEATH_RATE * td))
@@ -229,14 +230,11 @@ double mosquito_uninfected( double td )
 
 void mosquito_tainted( double td )
 {
-  printf("mt:%f - ", conveyor_get_population( m_pop->tainted_conv ));
   conveyor_add_influx( m_pop->uninfected * ((get_prob_bite_human_c * td) * p_host_c) , m_pop->tainted_conv );
 }
 
 double mosquito_vectors( double td )
 {
-  double out = conveyor_get_outflux( m_pop->tainted_conv );
-  printf("mv:+t:%f, -d:%f\n", out, (m_pop->vectors * (MOSQUITO_DEATH_RATE * td))); 
   return m_pop->vectors
           + conveyor_get_outflux( m_pop->tainted_conv )
           - (m_pop->vectors * (MOSQUITO_DEATH_RATE * td));
