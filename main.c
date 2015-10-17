@@ -151,13 +151,13 @@ int main( void )
   );
 
   /* Print CSV header */
-  printf("time,"
+  /*printf("time,"
         "human_newborn_uninfected,"
         "human_toddler_n_uninfected,human_toddler_n_tainted,human_toddler_n_hosts,human_toddler_n_pimmune,human_toddler_n_remission,"
         "human_toddler_s_uninfected,human_toddler_s_tainted,human_toddler_s_hosts,human_toddler_s_pimmune,human_toddler_s_remission,"
         "human_adult_uninfected,human_adult_tainted,human_adult_hosts,human_adult_pimmune,human_adult_remission,"
-          "mosquito_uninfected,mosquito_tainted,mosquito_vectors\n");
-//  printf("time,human_uninfected,human_tainted,human_hosts,human_pimmune,human_remission,mosquito_uninfected,mosquito_tainted,mosquito_vectors\n");
+          "mosquito_uninfected,mosquito_tainted,mosquito_vectors\n");*/
+  printf("time,human_uninfected,human_tainted,human_hosts,human_pimmune,human_remission,mosquito_uninfected,mosquito_tainted,mosquito_vectors\n");
 
   /* Main simulation loop */
   for (t = TIME_START; t <= (TIME_MAX + (TIME_D / 10.0)); t += TIME_D)
@@ -168,19 +168,19 @@ int main( void )
     if (t > report_interval - (TIME_D / 10.0)
         && t < report_interval + (TIME_D / 10.0))
     {
-      printf("%f,%f,%f%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t,
+/*      printf("%f,%f,%f%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",t,
         h_pop_newb->uninfected,
         h_pop_tod_n->uninfected,conveyor_get_population(h_pop_tod_n->tainted_conv),h_pop_tod_n->hosts,h_pop_tod_n->pimmune,h_pop_tod_n->remission,
         h_pop_tod_s->uninfected,conveyor_get_population(h_pop_tod_s->tainted_conv),h_pop_tod_s->hosts,h_pop_tod_s->pimmune,h_pop_tod_s->remission,
         h_pop_adult->uninfected,conveyor_get_population(h_pop_adult->tainted_conv),h_pop_adult->hosts,h_pop_adult->pimmune,h_pop_adult->remission,
-        m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);
-/*        printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n", t,
+        m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);*/
+        printf("%f,%f,%f,%f,%f,%f,%f,%f,%f\n", t,
           h_pop_newb->uninfected + h_pop_tod_n->uninfected + h_pop_tod_s->uninfected + h_pop_adult->uninfected,
           conveyor_get_population(h_pop_tod_n->tainted_conv) + conveyor_get_population(h_pop_tod_s->tainted_conv) + conveyor_get_population(h_pop_adult->tainted_conv),
           h_pop_tod_n->hosts + h_pop_tod_s->hosts + h_pop_adult->hosts,
           h_pop_tod_n->pimmune + h_pop_tod_s->pimmune + h_pop_adult->pimmune,
           h_pop_tod_n->remission + h_pop_tod_s->remission + h_pop_adult->remission,
-          m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);*/
+          m_pop->uninfected,conveyor_get_population(m_pop->tainted_conv),m_pop->vectors);
       report_interval += REPORT_INTERVAL;
     }
   }
