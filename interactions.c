@@ -159,7 +159,7 @@ double human_toddler_s_hosts( double td )
     + (h_pop_tod_s->remission * (RELAPSE_RATE * td))
           - (h_pop_tod_s->hosts
           * ((PIMMUNITY_RATE + RECOVERY_RATE + HUMAN_DEATH_RATE + REMISSION_RATE + FROM_TODDLER_TO_ADULT) * td))
-    - (h_pop_tod_s->hosts * (MALARIA_INDUCED_DEATH_RATE * SICKLE_CELL_MALARIA_SURVIVAL_RATE * td));
+    - (h_pop_tod_s->hosts * (MALARIA_INDUCED_DEATH_RATE_TODDLER * (1.0 - SICKLE_CELL_MALARIA_SURVIVAL_RATE) * td));
 }
 
 double human_toddler_s_pimmune( double td )
